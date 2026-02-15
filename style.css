@@ -91,7 +91,3 @@ body {
 
 .back-btn { background: none; border: none; font-size: 20px; color: var(--button-color); }
 .header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
-
-.extra-links {
-     background: none; border: none; font-size: 20px; color: var(--button-color);
-}
