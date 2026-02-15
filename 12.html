@@ -1,0 +1,760 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Авторизация - AxiomTeam RolePlay</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --bg-primary: #0f0f0f;
+            --bg-surface: #1a1816;
+            --bg-dark: #121212;
+            --accent: #b49164;
+            --accent-hover: #c9a87a;
+            --border: rgba(180, 145, 100, 0.2);
+            --text-primary: #ffffff;
+            --text-secondary: #9e9a95;
+            --success: #00C851;
+            --error: #ff4444;
+            --warning: #ffbb33;
+            --info: #33b5e5;
+            --discord: #5865F2;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: 
+                radial-gradient(circle at 20% 80%, rgba(180, 145, 100, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 20%, rgba(88, 101, 242, 0.1) 0%, transparent 50%);
+            z-index: -1;
+        }
+
+        /* Контейнер для уведомлений */
+        .toast-wrap {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .toast {
+            background: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 15px 20px;
+            min-width: 300px;
+            max-width: 400px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            animation: toastSlideIn 0.3s ease;
+            transform-origin: top right;
+            border-left: 4px solid var(--accent);
+            backdrop-filter: blur(10px);
+        }
+        
+        .toast-success {
+            border-left-color: var(--success);
+        }
+        
+        .toast-error {
+            border-left-color: var(--error);
+        }
+        
+        .toast-info {
+            border-left-color: var(--info);
+        }
+        
+        .toast-warning {
+            border-left-color: var(--warning);
+        }
+        
+        .toast-icon {
+            font-size: 20px;
+            width: 24px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .toast-success .toast-icon {
+            color: var(--success);
+        }
+        
+        .toast-error .toast-icon {
+            color: var(--error);
+        }
+        
+        .toast-info .toast-icon {
+            color: var(--info);
+        }
+        
+        .toast-warning .toast-icon {
+            color: var(--warning);
+        }
+        
+        .toast-content {
+            flex: 1;
+        }
+        
+        .toast-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 2px;
+            color: var(--text-primary);
+        }
+        
+        .toast-message {
+            font-size: 13px;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+        
+        .toast-close {
+            background: none;
+            border: none;
+            color: var(--text-secondary);
+            font-size: 18px;
+            cursor: pointer;
+            padding: 4px;
+            border-radius: 4px;
+            transition: all 0.2s;
+            line-height: 1;
+            height: 24px;
+            width: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .toast-close:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-primary);
+        }
+        
+        @keyframes toastSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(100%) scale(0.8);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0) scale(1);
+            }
+        }
+        
+        @keyframes toastSlideOut {
+            to {
+                opacity: 0;
+                transform: translateX(100%) scale(0.8);
+            }
+        }
+        
+        .toast.hiding {
+            animation: toastSlideOut 0.3s ease forwards;
+        }
+
+        /* Основная карточка авторизации */
+        .auth-wrap {
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .auth-card {
+            background: var(--bg-surface);
+            border-radius: 8px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border);
+            backdrop-filter: blur(20px);
+            transform: translateY(0);
+            transition: transform 0.3s ease;
+        }
+
+        .auth-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-header h2 {
+            font-size: 32px;
+            font-weight: 800;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            letter-spacing: 1px;
+        }
+
+        .auth-header h2 span {
+            color: var(--accent);
+        }
+
+        .auth-header p {
+            font-size: 14px;
+            color: var(--text-secondary);
+            letter-spacing: 0.5px;
+        }
+
+        /* Табы */
+        .tabs {
+            display: flex;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        .tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            color: var(--text-secondary);
+            position: relative;
+        }
+
+        .tab:hover {
+            color: var(--text-primary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab.active {
+            color: var(--text-primary);
+            background: var(--accent);
+        }
+
+        /* Формы */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            color: var(--text-primary);
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 2px rgba(180, 145, 100, 0.2);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-secondary);
+        }
+
+        /* Кнопки */
+        .auth-btn {
+            width: 100%;
+            padding: 14px;
+            border-radius: 4px;
+            border: none;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 10px 0;
+        }
+        
+        .auth-btn-primary {
+            background: linear-gradient(to right, #b49164, #9a7b4f);
+            color: #fff;
+            border: 1px solid rgba(180, 145, 100, 0.3);
+        }
+        
+        .auth-btn-primary:hover {
+            background: linear-gradient(to right, #c9a87a, #b49164);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(180, 145, 100, 0.3);
+        }
+        
+        .auth-btn-discord {
+            background: linear-gradient(to right, #5865F2, #4752C4);
+            color: #fff;
+            border: 1px solid rgba(88, 101, 242, 0.3);
+        }
+        
+        .auth-btn-discord:hover {
+            background: linear-gradient(to right, #4752C4, #3C45A5);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(88, 101, 242, 0.3);
+        }
+
+        /* Разделитель */
+        .auth-or-divider {
+            text-align: center;
+            margin: 20px 0;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .auth-or-divider::before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background: var(--border);
+        }
+        
+        .auth-or-divider::after {
+            content: '';
+            position: absolute;
+            right: 0;
+            top: 50%;
+            width: 45%;
+            height: 1px;
+            background: var(--border);
+        }
+
+        /* Успешная привязка Discord */
+        .discord-success {
+            background: rgba(88, 101, 242, 0.1);
+            border: 1px solid rgba(88, 101, 242, 0.2);
+            border-radius: 4px;
+            padding: 15px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .discord-success b {
+            color: var(--discord);
+            display: block;
+            margin-bottom: 5px;
+            font-size: 16px;
+        }
+        
+        .discord-success small {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        /* Загрузка */
+        .auth-loading {
+            opacity: 0.7;
+            pointer-events: none;
+            position: relative;
+        }
+        
+        .auth-loading::after {
+            content: '...';
+            animation: loadingDots 1.5s infinite;
+            position: absolute;
+            right: 20px;
+        }
+        
+        @keyframes loadingDots {
+            0%, 20% { content: '.'; }
+            40% { content: '..'; }
+            60%, 100% { content: '...'; }
+        }
+
+        /* Секции регистрации */
+        #step-2 {
+            text-align: center;
+        }
+
+        #step-2 p {
+            margin-bottom: 20px;
+            color: var(--text-secondary);
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 480px) {
+            .auth-card {
+                padding: 30px 20px;
+            }
+            
+            .toast {
+                min-width: 280px;
+                max-width: calc(100vw - 40px);
+            }
+            
+            .auth-header h2 {
+                font-size: 28px;
+            }
+        }
+
+        @media (max-width: 360px) {
+            .auth-card {
+                padding: 25px 15px;
+            }
+            
+            .tab {
+                padding: 10px;
+                font-size: 13px;
+            }
+            
+            .form-input {
+                padding: 12px;
+            }
+            
+            .auth-btn {
+                padding: 12px;
+                font-size: 13px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="toasts" class="toast-wrap"></div>
+    
+    <div class="auth-wrap">
+        <div class="auth-card">
+            <div class="auth-header">
+                <h2>Axiom<span>Team</span></h2>
+                <p>Авторизация</p>
+            </div>
+            
+            <div class="tabs">
+                <div class="tab active" onclick="setMode('login', this)">Вход</div>
+                <div class="tab" onclick="setMode('reg', this)">Регистрация</div>
+            </div>
+
+            <!-- Форма входа -->
+            <div id="login-box">
+                <div class="form-group">
+                    <input type="text" id="l_user" class="form-input" placeholder="Имя пользователя">
+                </div>
+                <div class="form-group">
+                    <input type="password" id="l_pass" class="form-input" placeholder="Пароль">
+                </div>
+                <button class="auth-btn auth-btn-primary" onclick="doLogin()">
+                    Войти
+                </button>
+                <div class="auth-or-divider">ИЛИ</div>
+                <button class="auth-btn auth-btn-discord" onclick="openDiscord()">
+                    <i class="fab fa-discord"></i> Войти через Discord
+                </button>
+            </div>
+
+            <!-- Форма регистрации -->
+            <div id="reg-box" style="display:none">
+                <div id="step-1">
+                    <div class="form-group">
+                        <input type="text" id="r_user" class="form-input" placeholder="Логин">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="r_pass" class="form-input" placeholder="Пароль">
+                    </div>
+                    <div class="form-group">
+                        <input type="password" id="r_pass2" class="form-input" placeholder="Повтор пароля">
+                    </div>
+                    <button class="auth-btn auth-btn-primary" onclick="goStep2()">
+                        Далее
+                    </button>
+                </div>
+                
+                <div id="step-2" style="display:none">
+                    <p>Привязка Discord обязательна для регистрации!</p>
+                    <div id="dc-res" style="margin-bottom:20px">
+                        <button class="auth-btn auth-btn-discord" onclick="openDiscord()">
+                            <i class="fab fa-discord"></i> Привязать Discord
+                        </button>
+                    </div>
+                    <button class="auth-btn auth-btn-primary" id="reg-btn" style="display:none" onclick="doReg()">
+                        Создать аккаунт
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let regData = {};
+        let toastCount = 0;
+        
+        // Функция для показа уведомлений
+        function toast(message, type = 'info') {
+            const container = document.getElementById('toasts');
+            const toast = document.createElement('div');
+            toast.className = `toast toast-${type}`;
+            toast.id = `toast-${++toastCount}`;
+            
+            const icons = {
+                success: '✓',
+                error: '✗',
+                warning: '⚠',
+                info: 'ℹ'
+            };
+            
+            const titles = {
+                success: 'Успех',
+                error: 'Ошибка',
+                warning: 'Внимание',
+                info: 'Информация'
+            };
+            
+            toast.innerHTML = `
+                <div class="toast-icon">${icons[type] || icons.info}</div>
+                <div class="toast-content">
+                    <div class="toast-title">${titles[type] || titles.info}</div>
+                    <div class="toast-message">${message}</div>
+                </div>
+                <button class="toast-close" onclick="closeToast('${toast.id}')">×</button>
+            `;
+            
+            container.appendChild(toast);
+            
+            // Автоматическое закрытие через 5 секунд
+            setTimeout(() => {
+                closeToast(toast.id);
+            }, 5000);
+        }
+        
+        function closeToast(id) {
+            const toast = document.getElementById(id);
+            if (!toast) return;
+            
+            toast.classList.add('hiding');
+            setTimeout(() => {
+                if (toast.parentElement) {
+                    toast.remove();
+                }
+            }, 300);
+        }
+        
+        // Переключение между вкладками
+        function setMode(mode, element) {
+            // Снимаем активный класс со всех табов
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Добавляем активный класс нажатому табу
+            element.classList.add('active');
+            
+            // Показываем нужную форму
+            document.getElementById('login-box').style.display = mode === 'login' ? 'block' : 'none';
+            document.getElementById('reg-box').style.display = mode === 'reg' ? 'block' : 'none';
+            
+            // Сбрасываем регистрацию при переключении
+            if (mode === 'login') {
+                resetRegForm();
+            }
+        }
+        
+        // Переход на второй шаг регистрации
+        function goStep2() {
+            const username = document.getElementById('r_user').value.trim();
+            const password = document.getElementById('r_pass').value;
+            const passwordConfirm = document.getElementById('r_pass2').value;
+            
+            // Валидация
+            if (!username || !password || !passwordConfirm) {
+                toast('Заполните все поля', 'error');
+                return;
+            }
+            
+            if (password !== passwordConfirm) {
+                toast('Пароли не совпадают', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                toast('Пароль должен быть не менее 6 символов', 'error');
+                return;
+            }
+            
+            if (username.length < 3) {
+                toast('Логин должен быть не менее 3 символов', 'error');
+                return;
+            }
+            
+            // Сохраняем данные
+            regData = {
+                user: username,
+                pass: password
+            };
+            
+            // Переходим ко второму шагу
+            document.getElementById('step-1').style.display = 'none';
+            document.getElementById('step-2').style.display = 'block';
+        }
+        
+        // Сброс формы регистрации
+        function resetRegForm() {
+            document.getElementById('r_user').value = '';
+            document.getElementById('r_pass').value = '';
+            document.getElementById('r_pass2').value = '';
+            document.getElementById('dc-res').innerHTML = `
+                <button class="auth-btn auth-btn-discord" onclick="openDiscord()">
+                    <i class="fab fa-discord"></i> Привязать Discord
+                </button>
+            `;
+            document.getElementById('reg-btn').style.display = 'none';
+            document.getElementById('step-1').style.display = 'block';
+            document.getElementById('step-2').style.display = 'none';
+            regData = {};
+        }
+        
+        // Открытие окна авторизации Discord
+        function openDiscord() {
+            // В реальном приложении здесь будет открытие OAuth2 окна
+            // Для демонстрации имитируем успешную привязку
+            setTimeout(() => {
+                finishDiscord(
+                    '123456789012345678',
+                    'Geo#1234',
+                    'https://cdn.discordapp.com/avatars/123456789012345678/avatar.png'
+                );
+            }, 1000);
+            
+            toast('Открывается окно авторизации Discord...', 'info');
+        }
+        
+        // Завершение привязки Discord
+        function finishDiscord(id, tag, avatar) {
+            regData.did = id;
+            regData.dtag = tag;
+            regData.dava = avatar;
+            
+            document.getElementById('dc-res').innerHTML = `
+                <div class="discord-success">
+                    <b>${tag}</b>
+                    <small>Успешно привязан</small>
+                </div>
+            `;
+            document.getElementById('reg-btn').style.display = 'flex';
+            
+            toast('Discord успешно привязан!', 'success');
+        }
+        
+        // Регистрация
+        async function doReg() {
+            const btn = document.getElementById('reg-btn');
+            const originalText = btn.innerHTML;
+            
+            btn.classList.add('auth-loading');
+            
+            // Имитация запроса к API
+            setTimeout(() => {
+                // В реальном приложении здесь будет fetch запрос
+                // const response = await fetch('../api/auth.php', {...});
+                
+                btn.classList.remove('auth-loading');
+                
+                // Демонстрация успешной регистрации
+                toast('Аккаунт успешно создан!', 'success');
+                
+                // Перенаправление в панель управления
+                setTimeout(() => {
+                    toast('Перенаправление в панель управления...', 'info');
+                    // В реальном приложении:
+                    // window.location.href = '../dashboard/';
+                }, 1000);
+            }, 1500);
+        }
+        
+        // Вход
+        async function doLogin() {
+            const username = document.getElementById('l_user').value.trim();
+            const password = document.getElementById('l_pass').value;
+            const btn = document.querySelector('#login-box .auth-btn-primary');
+            
+            if (!username || !password) {
+                toast('Заполните все поля', 'error');
+                return;
+            }
+            
+            btn.classList.add('auth-loading');
+            
+            // Имитация запроса к API
+            setTimeout(() => {
+                // В реальном приложении здесь будет fetch запрос
+                // const response = await fetch('../api/auth.php', {...});
+                
+                btn.classList.remove('auth-loading');
+                
+                // Демонстрация успешного входа
+                toast('Вход выполнен!', 'success');
+                
+                // Перенаправление в панель управления
+                setTimeout(() => {
+                    toast('Перенаправление в панель управления...', 'info');
+                    // В реальном приложении:
+                    // window.location.href = '../dashboard/';
+                }, 1000);
+            }, 1500);
+        }
+        
+        // Имитация API функции
+        async function api(url, data) {
+            // Для демонстрации просто возвращаем успешный ответ
+            return new Promise(resolve => {
+                setTimeout(() => {
+                    resolve({
+                        success: true,
+                        message: 'Операция выполнена успешно'
+                    });
+                }, 1000);
+            });
+        }
+        
+        // Инициализация при загрузке страницы
+        document.addEventListener('DOMContentLoaded', function() {
+            // Фокус на поле логина при загрузке
+            document.getElementById('l_user').focus();
+            
+            // Демонстрационное уведомление
+            setTimeout(() => {
+                toast('Добро пожаловать на AxiomTeam RolePlay!', 'info');
+            }, 500);
+        });
+    </script>
+</body>
+</html>
