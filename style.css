@@ -230,3 +230,94 @@ body {
     border-radius: 10px;
     font-size: 14px;
 }
+
+/* --- Кнопка "Привязать" и ссылки действий --- */
+.action-link {
+    background: rgba(0, 91, 255, 0.15);
+    color: var(--primary-blue);
+    border: none;
+    padding: 6px 14px;
+    border-radius: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    transition: all 0.2s ease;
+    cursor: pointer;
+}
+
+.action-link:hover {
+    background: var(--primary-blue);
+    color: #fff;
+}
+
+/* --- Ссылки в футере (Поддержка, Инструкция, Группа) --- */
+.links {
+    margin-top: 30px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 10px;
+}
+
+.link-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #1c212a; /* В тон карточек */
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+    color: var(--text-main) !important;
+    padding: 14px !important;
+    border-radius: 16px !important;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background 0.2s ease;
+}
+
+.link-btn:active {
+    background: #2d3440;
+}
+
+.link-btn::before {
+    font-size: 18px;
+}
+
+/* Специальный стиль для кнопки поддержки (выделение) */
+.link-btn[href*="admin"] {
+    border-color: rgba(0, 91, 255, 0.3) !important;
+    background: rgba(0, 91, 255, 0.05);
+}
+
+/* --- Оформление для кнопок-ссылок внутри блоков --- */
+.nav-btn-secondary {
+    background: #252a34 !important;
+    color: var(--text-main) !important;
+    border: none !important;
+}
+
+/* --- Кнопка "Отвязать аккаунт" (Danger Zone) --- */
+.nav-btn-danger {
+    background: rgba(255, 59, 48, 0.1) !important;
+    color: var(--accent-red) !important;
+    border: 1px solid rgba(255, 59, 48, 0.2) !important;
+    font-size: 14px;
+    font-weight: 600;
+    margin-top: 10px;
+}
+
+.nav-btn-danger:active {
+    background: var(--accent-red) !important;
+    color: #fff !important;
+}
+
+/* --- Улучшение кнопок Назад --- */
+.back-btn {
+    display: flex;
+    align-items: center;
+    background: #252a34;
+    border: none;
+    color: var(--text-main);
+    padding: 10px 16px;
+    border-radius: 12px;
+    font-size: 14px;
+    font-weight: 600;
+}
