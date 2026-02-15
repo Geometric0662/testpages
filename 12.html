@@ -3,69 +3,85 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>OzoHelper Engine</title>
+    <title>OzoHelper</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <main id="app">
-        <section class="balance-widget">
-            <div class="balance-info">
-                <p>Ваш баланс</p>
-                <h2 id="user-balance">0.00 ₽</h2>
+    <div id="app">
+        <section id="screen-main" class="screen">
+            <div class="user-card">
+                <div class="balance-info">
+                    <span class="label">Баланс</span>
+                    <span id="balance-value" class="value">0 ₽</span>
+                </div>
+                <div id="status-badge" class="status idle">Готов к работе</div>
             </div>
-            <button class="topup-icon-btn" onclick="showScreen('topup')">➕</button>
-        </section>
 
-        <section class="status-banner" id="account-status-banner">
-            <div class="status-dot pulsing"></div>
-            <span id="status-text">Аккаунт не привязан</span>
-            <button class="action-link" id="auth-btn">Привязать</button>
-        </section>
+            <div class="menu-grid">
+                <button onclick="showScreen('screen-warehouses')" class="menu-item">
+                    <span class="icon">📦</span> Склады
+                </button>
+                <button onclick="showScreen('screen-history')" class="menu-item">
+                    <span class="icon">📋</span> Смены
+                </button>
+                <button onclick="showScreen('screen-topup')" class="menu-item">
+                    <span class="icon">💰</span> Пополнить
+                </button>
+                <button onclick="showScreen('screen-referral')" class="menu-item">
+                    <span class="icon">🎁</span> Рефералы
+                </button>
+            </div>
 
-        <nav class="main-grid">
-            <div class="grid-item primary" onclick="showScreen('catch-setup')">
-                <div class="icon">🎯</div>
-                <span>Запустить ловлю</span>
-            </div>
-            <div class="grid-item" onclick="showScreen('warehouses')">
-                <div class="icon">📦</div>
-                <span>Склады</span>
-            </div>
-            <div class="grid-item" onclick="showScreen('history')">
-                <div class="icon">📋</div>
-                <span>История смен</span>
-            </div>
-            <div class="grid-item" onclick="showScreen('referral')">
-                <div class="icon">🎁</div>
-                <span>Рефералы</span>
-            </div>
-        </nav>
+            <button id="btn-main-action" class="main-button catch">🎯 ПОЙМАТЬ СМЕНУ</button>
 
-        <section class="active-tasks">
-            <h3>Активные задачи</h3>
-            <div id="tasks-list">
-                <div class="empty-state">Нет запущенных ловцов</div>
+            <div class="extra-links">
+                <button onclick="showScreen('screen-profile')">🔍 Профиль</button>
+                <button onclick="window.open('https://t.me/ozohelperadmin')">💬 Поддержка</button>
+                <button id="admin-entry" class="hidden" onclick="showScreen('screen-admin')">🔧 Админ</button>
             </div>
         </section>
 
-        <footer class="bottom-links">
-            <a href="https://t.me/ozohelperadmin">🆘 Поддержка</a>
-            <a href="#">📖 Инструкция</a>
-        </footer>
-    </main>
+        <section id="screen-warehouses" class="screen hidden">
+            <div class="header">
+                <button class="back-btn" onclick="showScreen('screen-main')">←</button>
+                <h2>Выберите склад</h2>
+            </div>
+            <input type="text" id="search-wh" placeholder="Поиск склада..." class="styled-input">
+            <div id="wh-list" class="list-container">
+                </div>
+        </section>
 
-    <div id="screen-topup" class="sub-screen hidden">
-        <header class="sub-header">
-            <button onclick="closeScreen()">← Назад</button>
-            <h2>Пополнение</h2>
-        </header>
-        <div class="content">
-            <input type="text" placeholder="Введите код ключа" class="main-input">
-            <button class="main-btn">Активировать</button>
-            <div class="divider">или</div>
-            <a href="#" class="buy-btn">Купить ключ в магазине</a>
-        </div>
+        <section id="screen-topup" class="screen hidden">
+            <div class="header">
+                <button class="back-btn" onclick="showScreen('screen-main')">←</button>
+                <h2>Пополнение</h2>
+            </div>
+            <div class="card">
+                <p>Введите лицензионный ключ:</p>
+                <input type="text" id="topup-key" placeholder="XXXX-XXXX-XXXX" class="styled-input">
+                <button class="main-button">Активировать</button>
+            </div>
+            <a href="#" class="buy-link">Купить ключ в магазине →</a>
+        </section>
+
+        <section id="screen-admin" class="screen hidden">
+            <div class="header">
+                <button class="back-btn" onclick="showScreen('screen-main')">←</button>
+                <h2>Админ-панель</h2>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-card">Ловцы: <b id="stat-active">0</b></div>
+                <div class="stat-card">В очереди: <b id="stat-queue">0</b></div>
+            </div>
+            <button class="main-button">Создать ключ (100₽)</button>
+        </section>
     </div>
+
+    <div id="loader" class="loader hidden">
+        <div class="spinner"></div>
+    </div>
+
+    <script src="app.js"></script>
 </body>
 </html>
