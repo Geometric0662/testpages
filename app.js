@@ -1,32 +1,48 @@
 const tg = window.Telegram.WebApp;
-tg.expand(); // Расширяем на весь экран
+tg.expand(); // Развернуть на весь экран
 
-// Настройка главной кнопки Telegram
-tg.MainButton.setText("ЗАКРЫТЬ ПРИЛОЖЕНИЕ");
-tg.MainButton.hide();
+// Инициализация цветов Telegram
+document.documentElement.style.setProperty('--tg-theme-bg-color', tg.themeParams.bg_color);
 
 function showScreen(screenId) {
-    tg.HapticFeedback.impactOccurred('medium');
-    // Логика переключения экранов
-    document.getElementById('app').classList.add('hidden');
-    document.getElementById('screen-' + screenId).classList.remove('hidden');
+    // Скрываем все экраны
+    document.querySelectorAll('.screen').forEach(s => s.classList.add('hidden'));
+    // Показываем нужный
+    document.getElementById(screenId).classList.remove('hidden');
     
-    // Показываем кнопку "Назад" в самом Telegram
-    tg.BackButton.show();
+    // Если мы не на главном, показываем кнопку "Назад" в самом Telegram
+    if (screenId !== 'screen-main') {
+        tg.BackButton.show();
+    } else {
+        tg.BackButton.hide();
+    }
 }
 
-tg.onEvent('backButtonClicked', function() {
-    // Возвращаемся на главный экран
-    document.querySelectorAll('.sub-screen').forEach(s => s.classList.add('hidden'));
-    document.getElementById('app').classList.remove('hidden');
-    tg.BackButton.hide();
+// Обработка кнопки "Назад" в Telegram
+tg.onEvent('backButtonClicked', () => {
+    showScreen('screen-main');
 });
 
-// Пример обработки авторизации
-document.getElementById('auth-btn').onclick = () => {
-    tg.showPopup({
-        title: 'Привязка Ozon',
-        message: 'Введите ваш номер телефона в следующем окне',
-        buttons: [{type: 'ok'}]
+// Пример функции для кнопки "Поймать смену"
+document.getElementById('btn-main-action').addEventListener('click', () => {
+    tg.HapticFeedback.impactOccurred('heavy'); // Виброотклик
+    tg.showConfirm("Запустить поиск смен?", (confirmed) => {
+        if (confirmed) {
+            tg.showScanQrPopup({ text: "Для теста: отсканируйте что-нибудь" });
+        }
     });
+});
+
+// Простая проверка на админа (замените на вашу логику через API)
+const user = tg.initDataUnsafe.user;
+if (user && user.id === 12345678) { // Ваш ID
+    document.getElementById('admin-entry').classList.remove('hidden');
+}
+
+// Имитация загрузки
+window.onload = () => {
+    const loader = document.getElementById('loader');
+    setTimeout(() => {
+        loader.classList.add('hidden');
+    }, 1000);
 };
